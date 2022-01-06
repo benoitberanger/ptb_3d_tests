@@ -148,7 +148,7 @@ while 1
     
     % LIGHT0
     light_pos_0 = [+1 0 0];
-    glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 0.0]);
+    glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 1.0]);
     glTranslatef(light_pos_0(1),light_pos_0(2),light_pos_0(3))
     glutWireSphere(0.01,10,10)
     

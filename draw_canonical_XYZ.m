@@ -1,6 +1,9 @@
 function draw_canonical_XYZ()
 global GL
 
+reset_position();
+set_camera();
+
 % X
 glBegin(GL.LINES);
 glMaterialfv(GL.FRONT_AND_BACK,GL.AMBIENT, [ 1.0 0.0 0.0 1 ]);
