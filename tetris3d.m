@@ -96,16 +96,17 @@ glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 light_is_point]);
 
 %% Start drawing
 
-distance = 8;
+distance = 10;
 
 dp = KbName('LeftControl');
 dm = KbName('RightControl');
-rp = KbName('LeftArrow');
-rm = KbName('RightArrow');
+rp = KbName('RightArrow');
+rm = KbName('LeftArrow');
 
 rotation = 0;
 
 while 1
+    
     
     [keyIsDown, secs, keyCode] = KbCheck();
     if keyIsDown
@@ -126,15 +127,15 @@ while 1
         end
         
         if keyCode(rp)
-            rotation = rotation + 1;
+            rotation = rotation + 5;
             fprintf('rotation = %d \n', rotation)
-            WaitSecs(0.020);
+%             WaitSecs(0.050);
         end
         
         if keyCode(rm)
-            rotation = rotation - 1;
+            rotation = rotation - 5;
             fprintf('rotation = %d \n', rotation)
-            WaitSecs(0.020);
+%             WaitSecs(0.050);
         end
         
     end
@@ -164,6 +165,7 @@ while 1
         ];
     
     set_camera_on_tetris_center(segments, distance);
+%     glRotatef(rotation, 0, 1, 0);
     draw_3d_tetris(segments);
     
     
@@ -175,7 +177,8 @@ while 1
     
     % Show rendered image at next vertical retrace:
 %     Screen('Flip', win);
-    
+%     Screen('FillRect', win); % to clean backbuffer
+
     % Begin OpenGL rendering into onscreen window again:
     Screen('BeginOpenGL', win);
     
@@ -203,9 +206,8 @@ while 1
         0 0 -3
         0 +2 0
         ];
-    
     set_camera_on_tetris_center(segments, distance);
-%     glRotatef(rotation, 0, 1, 0);
+    glRotatef(rotation, 0, 1, 0);
     draw_3d_tetris(segments);
     
     % Finish OpenGL rendering into PTB window. This will switch back to the
@@ -216,28 +218,30 @@ while 1
     
     % Show rendered image at next vertical retrace:
 %     Screen('Flip', win);
+%     Screen('FillRect', win); % to clean backbuffer
     
     Screen('BeginOpenGL', win);
     glClear;
     Screen('EndOpenGL', win);
     
     
-    %% BOTH
+    %% BOTHww
     
     img_L_cropped = auto_crop(img_L_raw);
     img_R_cropped = auto_crop(img_R_raw);
     
-    img_L_rect = [0 0 size(img_L_cropped,1) size(img_L_cropped,2)];
-    img_R_rect = [0 0 size(img_R_cropped,1) size(img_R_cropped,2)];
+    img_L_rect = [0 0 size(img_L_cropped,2) size(img_L_cropped,1)];
+    img_R_rect = [0 0 size(img_R_cropped,2) size(img_R_cropped,1)];
     
     texture_L = Screen('MakeTexture', win, img_L_cropped);
-    texture_R = Screen('MakeTexture', win, img_L_cropped);
+    texture_R = Screen('MakeTexture', win, img_R_cropped);
+    
+%     Screen('FillRect', win, 128)
     
     Screen('DrawTexture', win, texture_L, [], CenterRectOnPoint(img_L_rect, winRect(3)*1/4, winRect(4)/2))
     Screen('DrawTexture', win, texture_R, [], CenterRectOnPoint(img_R_rect, winRect(3)*3/4, winRect(4)/2))
     
     Screen('Flip', win);
-    KbWait;
     
     Screen('Close', texture_L);
     Screen('Close', texture_R);
