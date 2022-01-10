@@ -42,8 +42,8 @@ for iSegment = 1 : nSegment
         nDisplacement = nDisplacement -1;
     end
     for n = 1 : nDisplacement
-        glTranslatef(seg(1),seg(2),seg(3))
-        fcn(dim)
+        glTranslatef(seg(1),seg(2),seg(3)) % move
+        fcn(dim)                           % draw
     end
     
 end

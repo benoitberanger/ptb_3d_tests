@@ -2,8 +2,7 @@ sca
 clc
 clear
 
-% Is the script running in OpenGL Psychtoolbox? Abort, if not.
-PsychDefaultSetup(1);
+KbName('UnifyKeyNames');
 
 ESCAPE = KbName('ESCAPE');
 
@@ -97,53 +96,10 @@ glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 light_is_point]);
 
 %% Start drawing
 
-% Clear out the backbuffer: This also cleans the depth-buffer for
-% proper occlusion handling: You need to glClear the depth buffer whenever
-% you redraw your scene, e.g., in an animation loop. Otherwise occlusion
-% handling will screw up in funny ways...
-glClear;
+distance = 10;
 
-draw_canonical_XYZ()
-
-% First tetris on the LEFT side of the screen
-reset_position();
-
-% set_camera();
-
-segments = [
-     0  0 +2
-     0 -3  0
-    +2  0  0
-     0  0 -3
-     0 +2  0
-    ];
-
-
-set_camera_on_tetris_center(segments);
-draw_3d_tetris(segments);
-
-
-
-
-%% End of Drawing
-
-% Finish OpenGL rendering into PTB window. This will switch back to the
-% standard 2D drawing functions of Screen and will check for OpenGL errors.
-Screen('EndOpenGL', win);
-
-% imageArray = Screen('GetImage', win , [], 'backBuffer' );
-% imagesc(imageArray)
-% drawnow
-
-
-% Show rendered image at next vertical retrace:
-Screen('Flip', win);
-
-KbWait;
-
-% Begin OpenGL rendering into onscreen window again:
-Screen('BeginOpenGL', win);
-
+p = KbName('LeftControl');
+m = KbName('RightControl');
 
 while 1
     
@@ -152,7 +108,66 @@ while 1
         if keyCode(ESCAPE)
             break
         end
+        
+        if keyCode(m)
+            distance = distance + 1;
+            fprintf('distance = %d \n', distance)
+            WaitSecs(0.050);
+        end
+        
+        if keyCode(p)
+            distance = distance - 1;
+            fprintf('distance = %d \n', distance)
+            WaitSecs(0.050);
+        end
+        
     end
+    
+    % Clear out the backbuffer: This also cleans the depth-buffer for
+    % proper occlusion handling: You need to glClear the depth buffer whenever
+    % you redraw your scene, e.g., in an animation loop. Otherwise occlusion
+    % handling will screw up in funny ways...
+    glClear;
+    
+    draw_canonical_XYZ();
+    
+    % First tetris on the LEFT side of the screen
+    reset_position();
+    
+    % set_camera();
+    
+    segments = [
+        0  0 +2
+        0 -3  0
+       +2  0  0
+        0  0 -3
+        0 +2  0
+        ];
+    
+    
+    set_camera_on_tetris_center(segments, distance);
+    draw_3d_tetris(segments);
+    
+    
+    %% End of Drawing
+    
+    % Finish OpenGL rendering into PTB window. This will switch back to the
+    % standard 2D drawing functions of Screen and will check for OpenGL errors.
+    Screen('EndOpenGL', win);
+    
+    % imageArray = Screen('GetImage', win , [], 'backBuffer' );
+    % imagesc(imageArray)
+    % drawnow
+    
+    
+    % Show rendered image at next vertical retrace:
+    Screen('Flip', win);
+    
+    KbWait;
+    
+    % Begin OpenGL rendering into onscreen window again:
+    Screen('BeginOpenGL', win);
+    
     
 end
 
