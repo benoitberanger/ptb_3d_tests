@@ -96,10 +96,14 @@ glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 light_is_point]);
 
 %% Start drawing
 
-distance = 10;
+distance = 8;
 
-p = KbName('LeftControl');
-m = KbName('RightControl');
+dp = KbName('LeftControl');
+dm = KbName('RightControl');
+rp = KbName('LeftArrow');
+rm = KbName('RightArrow');
+
+rotation = 0;
 
 while 1
     
@@ -109,19 +113,34 @@ while 1
             break
         end
         
-        if keyCode(m)
+        if keyCode(dm)
             distance = distance + 1;
             fprintf('distance = %d \n', distance)
             WaitSecs(0.050);
         end
         
-        if keyCode(p)
+        if keyCode(dp)
             distance = distance - 1;
             fprintf('distance = %d \n', distance)
             WaitSecs(0.050);
         end
         
+        if keyCode(rp)
+            rotation = rotation + 1;
+            fprintf('rotation = %d \n', rotation)
+            WaitSecs(0.020);
+        end
+        
+        if keyCode(rm)
+            rotation = rotation - 1;
+            fprintf('rotation = %d \n', rotation)
+            WaitSecs(0.020);
+        end
+        
     end
+    
+    
+    %% LEFT
     
     % Clear out the backbuffer: This also cleans the depth-buffer for
     % proper occlusion handling: You need to glClear the depth buffer whenever
@@ -129,7 +148,7 @@ while 1
     % handling will screw up in funny ways...
     glClear;
     
-    draw_canonical_XYZ();
+    % draw_canonical_XYZ();
     
     % First tetris on the LEFT side of the screen
     reset_position();
@@ -137,41 +156,97 @@ while 1
     % set_camera();
     
     segments = [
-        0  0 +2
-        0 -3  0
-       +2  0  0
-        0  0 -3
-        0 +2  0
+        0 0 +2
+        0 -3 0
+        +2 0 0
+        0 0 -3
+        0 +2 0
         ];
-    
     
     set_camera_on_tetris_center(segments, distance);
     draw_3d_tetris(segments);
     
     
-    %% End of Drawing
-    
     % Finish OpenGL rendering into PTB window. This will switch back to the
     % standard 2D drawing functions of Screen and will check for OpenGL errors.
     Screen('EndOpenGL', win);
     
-    % imageArray = Screen('GetImage', win , [], 'backBuffer' );
-    % imagesc(imageArray)
-    % drawnow
-    
+    img_L_raw = Screen('GetImage', win , [], 'backBuffer' );
     
     % Show rendered image at next vertical retrace:
-    Screen('Flip', win);
-    
-    KbWait;
+%     Screen('Flip', win);
     
     % Begin OpenGL rendering into onscreen window again:
     Screen('BeginOpenGL', win);
     
     
+    %% RIGHT
+    
+    
+    % Clear out the backbuffer: This also cleans the depth-buffer for
+    % proper occlusion handling: You need to glClear the depth buffer whenever
+    % you redraw your scene, e.g., in an animation loop. Otherwise occlusion
+    % handling will screw up in funny ways...
+    glClear;
+    
+    % draw_canonical_XYZ();
+    
+    % First tetris on the LEFT side of the screen
+    reset_position();
+    
+    % set_camera();
+    
+    segments = [
+        0 0 +2
+        0 -3 0
+        +2 0 0
+        0 0 -3
+        0 +2 0
+        ];
+    
+    set_camera_on_tetris_center(segments, distance);
+%     glRotatef(rotation, 0, 1, 0);
+    draw_3d_tetris(segments);
+    
+    % Finish OpenGL rendering into PTB window. This will switch back to the
+    % standard 2D drawing functions of Screen and will check for OpenGL errors.
+    Screen('EndOpenGL', win);
+    
+    img_R_raw = Screen('GetImage', win , [], 'backBuffer' );
+    
+    % Show rendered image at next vertical retrace:
+%     Screen('Flip', win);
+    
+    Screen('BeginOpenGL', win);
+    glClear;
+    Screen('EndOpenGL', win);
+    
+    
+    %% BOTH
+    
+    img_L_cropped = auto_crop(img_L_raw);
+    img_R_cropped = auto_crop(img_R_raw);
+    
+    img_L_rect = [0 0 size(img_L_cropped,1) size(img_L_cropped,2)];
+    img_R_rect = [0 0 size(img_R_cropped,1) size(img_R_cropped,2)];
+    
+    texture_L = Screen('MakeTexture', win, img_L_cropped);
+    texture_R = Screen('MakeTexture', win, img_L_cropped);
+    
+    Screen('DrawTexture', win, texture_L, [], CenterRectOnPoint(img_L_rect, winRect(3)*1/4, winRect(4)/2))
+    Screen('DrawTexture', win, texture_R, [], CenterRectOnPoint(img_R_rect, winRect(3)*3/4, winRect(4)/2))
+    
+    Screen('Flip', win);
+    KbWait;
+    
+    Screen('Close', texture_L);
+    Screen('Close', texture_R);
+    
+    Screen('BeginOpenGL', win);
+    
+    
 end
 
-% End of OpenGL rendering...
 Screen('EndOpenGL', win);
 
 % Close onscreen window and release all other ressources:
