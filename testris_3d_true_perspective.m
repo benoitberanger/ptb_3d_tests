@@ -16,6 +16,9 @@ Screen('Preference', 'VisualDebugLevel', 1);
 screenid=1;
 [win , winRect] = Screen('OpenWindow', screenid, 0 , [],  [], [], [], 4);
 
+%This is our alpha blending mode
+Screen(win,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 % Setup the OpenGL rendering context of the onscreen window for use by
 % OpenGL wrapper. After this command, all following OpenGL commands will
 % draw into the onscreen window 'win':
@@ -75,7 +78,7 @@ glLoadIdentity;
 % Field of view is 25 degrees from line of sight. Objects closer than
 % 0.1 distance units or farther away than 100 distance units get clipped
 % away, aspect ratio is adapted to the monitors aspect ratio:
-gluPerspective(25,1/AspectRatio,0.1,100);
+gluPerspective(25,1/AspectRatio,0.01,100);
 
 reset_position();
 
@@ -96,14 +99,16 @@ glLightfv(GL.LIGHT0,GL.POSITION,[ light_pos_0 light_is_point]);
 
 %% Start drawing
 
-distance = 10;
+distance_pos = KbName( 'LeftControl');
+distance_neg = KbName('RightControl');
+rotation_pos = KbName(  'RightArrow');
+rotation_neg = KbName(   'LeftArrow');
+move_pos     = KbName(     'UpArrow');
+move_neg     = KbName(   'DownArrow');
 
-dp = KbName('LeftControl');
-dm = KbName('RightControl');
-rp = KbName('RightArrow');
-rm = KbName('LeftArrow');
-
-rotation = 0;
+distance = 20;
+rotation = -45;
+move = 3;
 
 while 1
     
@@ -114,30 +119,34 @@ while 1
             break
         end
         
-        if keyCode(dm)
-            distance = distance + 1;
-            fprintf('distance = %d \n', distance)
+        if keyCode(distance_neg)
+            distance = distance + .1;
         end
         
-        if keyCode(dp)
-            distance = distance - 1;
-            fprintf('distance = %d \n', distance)
+        if keyCode(distance_pos)
+            distance = distance - .1;
         end
         
-        if keyCode(rp)
-            rotation = rotation + 5;
-            fprintf('rotation = %d \n', rotation)
+        if keyCode(rotation_pos)
+            rotation = rotation + 1;
         end
         
-        if keyCode(rm)
-            rotation = rotation - 5;
-            fprintf('rotation = %d \n', rotation)
+        if keyCode(rotation_neg)
+            rotation = rotation - 1;
+        end
+        
+        if keyCode(move_pos)
+            move = move + .01;
+        end
+        
+        if keyCode(move_neg)
+            move = move - .01;
         end
         
     end
     
     
-    %% LEFT
+    %% Draw
     
     % Clear out the backbuffer: This also cleans the depth-buffer for
     % proper occlusion handling: You need to glClear the depth buffer whenever
@@ -145,13 +154,14 @@ while 1
     % handling will screw up in funny ways...
     glClear;
     
-    % draw_canonical_XYZ();
-    
     % First tetris on the LEFT side of the screen
     reset_position();
     
-    % set_camera();
-    
+    gluLookAt(...
+        0,distance/2,distance,...
+        0,0,5,...
+        0,1,0);
+        
     segments = [
         0 0 +2
         0 -3 0
@@ -160,84 +170,27 @@ while 1
         0 +2 0
         ];
     
-    set_camera_on_tetris_center(segments, distance);
-%     glRotatef(rotation, 0, 1, 0);
+    glTranslatef(-move,0,0)
+    glRotatef(+rotation,0,1,0)
     draw_3d_tetris(segments);
-    
+    glRotatef(-rotation,0,1,0)
+    glTranslatef(+move,0,0)
+        
+    glTranslatef(+move,0,0)
+    glRotatef(+rotation,0,1,0)
+    draw_3d_tetris(segments);
     
     % Finish OpenGL rendering into PTB window. This will switch back to the
     % standard 2D drawing functions of Screen and will check for OpenGL errors.
     Screen('EndOpenGL', win);
     
-    img_L_raw = Screen('GetImage', win , [], 'backBuffer' );
-    
     % Show rendered image at next vertical retrace:
-%     Screen('Flip', win);
-%     Screen('FillRect', win); % to clean backbuffer
-
+    Screen('Flip', win);
+    
     % Begin OpenGL rendering into onscreen window again:
     Screen('BeginOpenGL', win);
     
     
-    %% RIGHT
-    
-    
-    % Clear out the backbuffer: This also cleans the depth-buffer for
-    % proper occlusion handling: You need to glClear the depth buffer whenever
-    % you redraw your scene, e.g., in an animation loop. Otherwise occlusion
-    % handling will screw up in funny ways...
-    glClear;
-    
-    % draw_canonical_XYZ();
-    
-    % First tetris on the LEFT side of the screen
-    reset_position();
-    
-    % set_camera();
-    
-    segments(:,1) = -segments(:,1);
-    
-    set_camera_on_tetris_center(segments, distance);
-    glRotatef(rotation+90, 0, 1, 0); % +90 because of mirror
-    draw_3d_tetris(segments);
-    
-    % Finish OpenGL rendering into PTB window. This will switch back to the
-    % standard 2D drawing functions of Screen and will check for OpenGL errors.
-    Screen('EndOpenGL', win);
-    
-    img_R_raw = Screen('GetImage', win , [], 'backBuffer' );
-    
-    % Show rendered image at next vertical retrace:
-%     Screen('Flip', win);
-%     Screen('FillRect', win); % to clean backbuffer
-    
-    Screen('BeginOpenGL', win);
-    glClear;
-    Screen('EndOpenGL', win);
-    
-    
-    %% BOTHww
-    
-    img_L_cropped = auto_crop(img_L_raw);
-    img_R_cropped = auto_crop(img_R_raw);
-    
-    img_L_rect = [0 0 size(img_L_cropped,2) size(img_L_cropped,1)];
-    img_R_rect = [0 0 size(img_R_cropped,2) size(img_R_cropped,1)];
-    
-    texture_L = Screen('MakeTexture', win, img_L_cropped);
-    texture_R = Screen('MakeTexture', win, img_R_cropped);
-    
-%     Screen('FillRect', win, 128)
-    
-    Screen('DrawTexture', win, texture_L, [], CenterRectOnPoint(img_L_rect, winRect(3)*1/4, winRect(4)/2))
-    Screen('DrawTexture', win, texture_R, [], CenterRectOnPoint(img_R_rect, winRect(3)*3/4, winRect(4)/2))
-    
-    Screen('Flip', win);
-    
-    Screen('Close', texture_L);
-    Screen('Close', texture_R);
-    
-    Screen('BeginOpenGL', win);
     
     
 end

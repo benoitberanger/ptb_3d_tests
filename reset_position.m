@@ -2,6 +2,6 @@ function reset_position()
 global GL
 
 glMatrixMode(GL.MODELVIEW);
-glLoadIdentity;
+glLoadIdentity();
 
 end % function

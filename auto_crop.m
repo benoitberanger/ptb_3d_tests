@@ -16,6 +16,6 @@ up_lim    = ud_limits(1);
 down_lim  = ud_limits(end)+1;
 
 % do the crop
-o = i(up_lim:down_lim, left_lim:right_lim, :);
+o = cat(3, i(up_lim:down_lim, left_lim:right_lim, :), 255*mask(up_lim:down_lim, left_lim:right_lim, :));
 
 end

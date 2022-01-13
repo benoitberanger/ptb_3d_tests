@@ -6,14 +6,14 @@ glMaterialfv(GL.FRONT_AND_BACK,GL.AMBIENT, [ 0.2 0.2 0.2 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.DIFFUSE, [ 0.5 0.5 0.5 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.SHININESS, 30);
 glMaterialfv(GL.FRONT_AND_BACK,GL.SPECULAR,[ 0.5 0.5 0.5 1 ]);
-draw_cubes(segments,'solid',1.0)
+draw_cubes(segments,'solid',0.999)
 glPopMatrix();
 
 glPushMatrix();
 glMaterialfv(GL.FRONT_AND_BACK,GL.AMBIENT, [ 0.0 0.0 0.0 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.DIFFUSE, [ 0.0 0.0 0.0 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.SPECULAR,[ 0.0 0.0 0.0 1 ]);
-draw_cubes(segments,'wired',1.002)
+draw_cubes(segments,'wired',1.005)
 glPopMatrix();
 
 
