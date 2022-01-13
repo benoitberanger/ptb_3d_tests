@@ -121,32 +121,26 @@ while 1
         
         if keyCode(distance_neg)
             distance = distance + 1;
-            fprintf('distance = %d \n', distance)
         end
         
         if keyCode(distance_pos)
             distance = distance - 1;
-            fprintf('distance = %d \n', distance)
         end
         
         if keyCode(rotation_pos)
             rotation = rotation + 5;
-            fprintf('rotation = %d \n', rotation)
         end
         
         if keyCode(rotation_neg)
             rotation = rotation - 5;
-            fprintf('rotation = %d \n', rotation)
         end
         
         if keyCode(move_pos)
             move = move - 10;
-            fprintf('move = %d \n', move)
         end
         
         if keyCode(move_neg)
             move = move + 10;
-            fprintf('move = %d \n', move)
         end
         
     end
