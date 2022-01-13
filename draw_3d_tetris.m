@@ -13,7 +13,7 @@ glPushMatrix();
 glMaterialfv(GL.FRONT_AND_BACK,GL.AMBIENT, [ 0.0 0.0 0.0 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.DIFFUSE, [ 0.0 0.0 0.0 1 ]);
 glMaterialfv(GL.FRONT_AND_BACK,GL.SPECULAR,[ 0.0 0.0 0.0 1 ]);
-draw_cubes(segments,'wired',1.005)
+draw_cubes(segments,'wired',1.002)
 glPopMatrix();
 
 

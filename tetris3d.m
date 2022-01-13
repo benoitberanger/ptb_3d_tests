@@ -117,25 +117,21 @@ while 1
         if keyCode(dm)
             distance = distance + 1;
             fprintf('distance = %d \n', distance)
-            WaitSecs(0.050);
         end
         
         if keyCode(dp)
             distance = distance - 1;
             fprintf('distance = %d \n', distance)
-            WaitSecs(0.050);
         end
         
         if keyCode(rp)
             rotation = rotation + 5;
             fprintf('rotation = %d \n', rotation)
-%             WaitSecs(0.050);
         end
         
         if keyCode(rm)
             rotation = rotation - 5;
             fprintf('rotation = %d \n', rotation)
-%             WaitSecs(0.050);
         end
         
     end
@@ -199,15 +195,10 @@ while 1
     
     % set_camera();
     
-    segments = [
-        0 0 +2
-        0 -3 0
-        +2 0 0
-        0 0 -3
-        0 +2 0
-        ];
+    segments(:,1) = -segments(:,1);
+    
     set_camera_on_tetris_center(segments, distance);
-    glRotatef(rotation, 0, 1, 0);
+    glRotatef(rotation+90, 0, 1, 0); % +90 because of mirror
     draw_3d_tetris(segments);
     
     % Finish OpenGL rendering into PTB window. This will switch back to the
